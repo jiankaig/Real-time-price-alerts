@@ -59,6 +59,14 @@ object StockDataApiStreaming{
     var continue = true
     val intervalSeconds = 10
 
+    case class WatchListData(
+        val id: Int, 
+        val SYM: String, 
+        val Price: Int, 
+        val SRC: String, 
+        val CreateTimeStamp: String, 
+        val LastUpdateTimeStamp_UNIX: Int
+    )       
     
     val api = new HttpClient()
 
