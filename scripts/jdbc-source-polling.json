@@ -1,0 +1,17 @@
+{
+  "name": "jdbc-source",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+    "tasks.max": "1",
+    "connection.url": "jdbc:sqlite:/tmp/data/watch_list.db",
+    "mode": "bulk",
+    "query": "SELECT * FROM watch_list",
+    "topic.prefix": "source-topic",
+    "transforms":"createKey,extractKey",
+    "transforms.createKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.createKey.fields":"SYM",
+    "transforms.extractKey.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.extractKey.field":"SYM",
+    "name": "jdbc-source"
+  }
+}

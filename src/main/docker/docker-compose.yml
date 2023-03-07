@@ -1,0 +1,79 @@
+version: '2'
+services:
+  zookeeper:
+    platform: linux/arm64
+    image: confluentinc/cp-zookeeper:latest # 7.3.2
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    platform: linux/arm64
+    image: confluentinc/cp-kafka:latest # 7.3.2
+    hostname: broker
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      # KAFKA_LISTENERS: PLAINTEXT://localhost:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+
+  schema-registry:
+    platform: linux/arm64
+    image: confluentinc/cp-schema-registry:latest
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - kafka
+      - zookeeper
+    ports:
+      - '8081'
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+
+  kafka-connect:
+    platform: linux/arm64
+    image: confluentinc/cp-kafka-connect:latest
+    hostname: kafka-connect
+    container_name: kafka-connect
+    depends_on:
+      - kafka
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_REST_PORT: 8083
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
+      CONNECT_PLUGIN_PATH: /usr/share/java
+      CONNECT_BOOTSTRAP_SERVERS: kafka:29092
+      # CONNECT_BOOTSTRAP_SERVERS: localhost:9092,kafka:29092,localhost:29092,0.0.0.0:9092,0.0.0.0:29092
+      CONNECT_GROUP_ID: quickstart
+      CONNECT_CONFIG_STORAGE_TOPIC: connect-config-storage-topic
+      CONNECT_OFFSET_STORAGE_TOPIC: connect-offset-storage-topic
+      CONNECT_STATUS_STORAGE_TOPIC: connect-status-storage-topic
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.json.JsonSchemaConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+
+    volumes:
+      - $PWD/plugins/confluentinc-kafka-connect-jdbc-10.6.4/lib:/usr/share/java/confluentinc-kafka-connect-jdbc
+      - $PWD/data:/tmp/data
+      - $PWD/scripts:/tmp/scripts

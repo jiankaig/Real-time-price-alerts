@@ -1,0 +1,4 @@
+[0m[[0m[0mdebug[0m] [0m[0m[app-build] Classpath dependencies List()[0m
+[0m[[0m[0mdebug[0m] [0m[0m[app-build] Dependencies from configurations List()[0m
+[0m[[0m[0mdebug[0m] [0m[0mBloop wrote the configuration of project 'app-build' to '/Users/kaikai/Projects/Real-time-price-alerts/app/project/.bloop/app-build.json'[0m
+[0m[[0m[32msuccess[0m] [0m[0mGenerated .bloop/app-build.json[0m

@@ -1,0 +1,13 @@
+{
+    "name": "jdbc-source",
+    "config": {
+      "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+      "tasks.max": "1",
+      "connection.url": "jdbc:sqlite:/tmp/data/watch_list.db",
+      "mode": "timestamp",
+      "timestamp.column.name": "LastUpdateTimeStamp_UNIX",
+      "query": "SELECT * FROM watch_list",
+      "topic.prefix": "source-topic",
+      "name": "jdbc-source"
+    }
+  }
