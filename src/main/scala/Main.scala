@@ -140,22 +140,5 @@ object StockDataApiStreaming{
         sys.ShutdownHookThread {
             streams.close(Duration.ofSeconds(10))
         }
-        
-        println("type 'q' and Enter to exit within the next interval")
-        while(continue){
-            print(".")
-            // Stop Sending when q+Enter is pressed
-            if (System.in.available() > 0) {
-                println("key q was pressed")
-                val key = System.in.read()
-                if (key.toChar == 'q') {
-                    continue = false
-                }
-            }
-
-            // Wait for specified interval before making next request
-            TimeUnit.SECONDS.sleep(intervalSeconds)
-        }
-        sys.exit() 
     }
 }
