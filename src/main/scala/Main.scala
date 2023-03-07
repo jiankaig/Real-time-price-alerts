@@ -1,22 +1,27 @@
 
 
 // Serdes
-// import org.apache.kafka.streams.scala.StreamsBuilder
-// import modules.CirceSerdes._
-// import io.circe.{Decoder, Encoder, Printer}
-// // import org.apache.kafka.streams.scala.serialization.Serdes
-// import org.apache.kafka.streams.scala.serialization.Serdes._
-// import org.apache.kafka.streams.scala.ImplicitConversions._
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
+import io.circe.{Decoder, Encoder}
+import org.apache.kafka.common.serialization.Serde
+import org.apache.kafka.streams.scala._
+import org.apache.kafka.streams.scala.serialization.Serdes
 
-import io.github.azhur.kafkaserdecirce.CirceSupport
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.streams.{ KafkaStreams, StreamsConfig, Topology }
-import org.apache.kafka.streams.scala.StreamsBuilder
+
+// //azhur/kafka-serde-scala
+// import io.github.azhur.kafkaserdecirce.CirceSupport
+// import org.apache.kafka.clients.consumer.ConsumerConfig
+// import org.apache.kafka.streams.{ KafkaStreams, StreamsConfig, Topology }
+// import org.apache.kafka.streams.scala.StreamsBuilder
 
 // Built ins
-import java.time.Duration
-import java.util.Properties
 import java.util.concurrent.TimeUnit
+import java.time.Duration
+import java.time.temporal.ChronoUnit
+import java.util.Properties
+import scala.concurrent.duration._
 
 // Custom
 import modules.HttpClient
@@ -40,10 +45,25 @@ import java.util.concurrent.ExecutionException
 // import scala.io
 
 
-object StockDataApiStreaming extends App with CirceSupport{
-    import io.circe.generic.auto._
+object StockDataApiStreaming{
+    // import io.circe.generic.auto._
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.Serdes._
+
+    implicit def serde[A >: Null : Decoder : Encoder]: Serde[A] = {
+        val serializer = (a: A) => a.asJson.noSpaces.getBytes
+        val deserializer = (aAsBytes: Array[Byte]) => {
+        val aAsString = new String(aAsBytes)
+        val aOrError = decode[A](aAsString)
+        aOrError match {
+            case Right(a) => Option(a)
+            case Left(error) =>
+            println(s"There was an error converting the message $aOrError, $error")
+            Option.empty
+        }
+        }
+        Serdes.fromFn[A](serializer, deserializer)
+    }
 
     val SourceTopic: String = "source-topic"
     val SymbolsTopic: String = "symbols-topic"
@@ -68,6 +88,8 @@ object StockDataApiStreaming extends App with CirceSupport{
     val config = new Properties()
     config.put(StreamsConfig.APPLICATION_ID_CONFIG, "api-data-producer")
     config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+    config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.stringSerde.getClass)
+
 
     // Check topics
     try {
@@ -90,49 +112,50 @@ object StockDataApiStreaming extends App with CirceSupport{
     }
 
 
+    def main(args: Array[String]): Unit = {
 
-    // Create a StreamsBuilder object
-    val builder = new StreamsBuilder()
+        // Create a StreamsBuilder object
+        val builder = new StreamsBuilder()
 
-    //**    Topology     **//
+        //**    Topology     **//
 
-    val watch_list_stream: KStream[String, WatchListData] = builder.stream[String, WatchListData]("source-topic").peek((_,d) => println(d))
-    watch_list_stream.foreach(SendApiAction)
-    watch_list_stream.to("api-sink-topic")
+        val watch_list_stream: KStream[String, WatchListData] = builder.stream[String, WatchListData]("source-topic").peek((_,d) => println(d))
+        watch_list_stream.foreach(SendApiAction)
+        watch_list_stream.to("api-sink-topic")
 
-    // val stock_quote_data_stream = grouped_by_SYM_stream.foreach(SendApiAction)
-    // stock_quote_data_stream.to(PriceUpdateTopic)
+        // val stock_quote_data_stream = grouped_by_SYM_stream.foreach(SendApiAction)
+        // stock_quote_data_stream.to(PriceUpdateTopic)
 
-    //.peek((_,d) => println(d))
+        //.peek((_,d) => println(d))
 
-    //** End of Topology **//
+        //** End of Topology **//
 
 
-    // Start the Kafka Streams application
-    val streams = new KafkaStreams(builder.build(), config)
-    streams.cleanUp()
-    streams.start()
+        // Start the Kafka Streams application
+        val streams = new KafkaStreams(builder.build(), config)
+        streams.cleanUp()
+        streams.start()
 
-    // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
-    sys.ShutdownHookThread {
-        streams.close(Duration.ofSeconds(10))
-    }
-    
-    println("type 'q' and Enter to exit within the next interval")
-    while(continue){
-        print(".")
-        // Stop Sending when q+Enter is pressed
-        if (System.in.available() > 0) {
-            println("key q was pressed")
-            val key = System.in.read()
-            if (key.toChar == 'q') {
-                continue = false
-            }
+        // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
+        sys.ShutdownHookThread {
+            streams.close(Duration.ofSeconds(10))
         }
+        
+        println("type 'q' and Enter to exit within the next interval")
+        while(continue){
+            print(".")
+            // Stop Sending when q+Enter is pressed
+            if (System.in.available() > 0) {
+                println("key q was pressed")
+                val key = System.in.read()
+                if (key.toChar == 'q') {
+                    continue = false
+                }
+            }
 
-        // Wait for specified interval before making next request
-        TimeUnit.SECONDS.sleep(intervalSeconds)
+            // Wait for specified interval before making next request
+            TimeUnit.SECONDS.sleep(intervalSeconds)
+        }
+        sys.exit() 
     }
-    sys.exit() 
-    
 }
