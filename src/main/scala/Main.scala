@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutionException
 // import scala.io
 
 
+case class WatchListData(id: Int, SYM: String, Price: Int, SRC: String, CreateTimeStamp: String, LastUpdateTimeStamp_UNIX: Int)       
 object StockDataApiStreaming extends App with CirceSupport{
     import io.circe.generic.auto._
     import org.apache.kafka.streams.scala.ImplicitConversions._
@@ -53,7 +54,6 @@ object StockDataApiStreaming extends App with CirceSupport{
     var continue = true
     val intervalSeconds = 10
 
-    case class WatchListData(id: Int, SYM: String, Price: Int, SRC: String, CreateTimeStamp: String, LastUpdateTimeStamp_UNIX: Int)       
     
     val api = new HttpClient()
 
