@@ -34,14 +34,10 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
-  "io.circe" %% "circe-jawn" % "0.14.1",
 
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
-
-  "io.github.azhur" %% "kafka-serde-circe" % "0.5.0",
-  "com.goyeau" %% "kafka-streams-circe" % "0.6.3",
-
   "ch.qos.logback" % "logback-classic" % "1.1.3" //% Runtime,
+
 )
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
