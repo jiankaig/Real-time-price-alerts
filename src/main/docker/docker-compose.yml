@@ -70,7 +70,8 @@ services:
       CONNECT_OFFSET_STORAGE_TOPIC: connect-offset-storage-topic
       CONNECT_STATUS_STORAGE_TOPIC: connect-status-storage-topic
       CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.json.JsonSchemaConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: false
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
 
     volumes:
