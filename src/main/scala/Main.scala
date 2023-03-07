@@ -98,6 +98,7 @@ object StockDataApiStreaming extends App with CirceSupport{
 
     val watch_list_stream: KStream[String, WatchListData] = builder.stream[String, WatchListData]("source-topic").peek((_,d) => println(d))
     watch_list_stream.foreach(SendApiAction)
+    watch_list_stream.to("api-sink-topic")
 
     // val stock_quote_data_stream = grouped_by_SYM_stream.foreach(SendApiAction)
     // stock_quote_data_stream.to(PriceUpdateTopic)

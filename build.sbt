@@ -26,14 +26,15 @@ version := "1.0"
 // You can define other libraries as dependencies in your build like this:
 
 libraryDependencies ++= Seq(
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
     
-  "org.apache.kafka" % "kafka-clients" % "3.4.0",
-  "org.apache.kafka" % "kafka-streams" % "3.4.0",
-  "org.apache.kafka" %% "kafka-streams-scala" % "3.4.0",
+  "org.apache.kafka" % "kafka-clients" % "2.8.0",
+  "org.apache.kafka" % "kafka-streams" % "2.8.0",
+  "org.apache.kafka" %% "kafka-streams-scala" % "2.8.0",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
+  "io.circe" %% "circe-jawn" % "0.14.1",
 
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
 
