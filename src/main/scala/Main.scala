@@ -1,55 +1,42 @@
-
-
-// Serdes
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
-import io.circe.{Decoder, Encoder}
-import org.apache.kafka.common.serialization.Serde
-import org.apache.kafka.streams.scala._
-import org.apache.kafka.streams.scala.serialization.Serdes
-
-
-// //azhur/kafka-serde-scala
-// import io.github.azhur.kafkaserdecirce.CirceSupport
-// import org.apache.kafka.clients.consumer.ConsumerConfig
-// import org.apache.kafka.streams.{ KafkaStreams, StreamsConfig, Topology }
-// import org.apache.kafka.streams.scala.StreamsBuilder
-
 // Built ins
-import java.util.concurrent.TimeUnit
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import java.util.Properties
 import scala.concurrent.duration._
+// import java.util.concurrent.TimeUnit
+import java.util.concurrent.ExecutionException // for AdminClient
 
 // Custom
 import modules.HttpClient
 import models.Data_Model
 
-// Kafka Streams
+// Lib
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
+import io.circe.{Decoder, Encoder}
+import org.apache.kafka.common.serialization.Serde
+import org.apache.kafka.common.serialization.StringSerializer // for Producer
+import org.apache.kafka.common.errors.TimeoutException // for AdminClient
+import org.apache.kafka.streams.kstream.{GlobalKTable, JoinWindows, TimeWindows, Windowed}
+import org.apache.kafka.streams.scala.ImplicitConversions._
+import org.apache.kafka.streams.scala._
+import org.apache.kafka.streams.scala.kstream.{KGroupedStream, KStream, KTable}
+import org.apache.kafka.streams.scala.serialization.Serdes
+import org.apache.kafka.streams.scala.serialization.Serdes._
+import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
+// import org.apache.kafka.streams.scala.Serdes._
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-import org.apache.kafka.common.serialization.StringSerializer
+import org.apache.kafka.clients.admin.{AdminClientConfig, ListTopicsOptions}
+import org.apache.kafka.clients.admin.AdminClient
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
-import org.apache.kafka.streams.kstream.{GlobalKTable, JoinWindows, TimeWindows, Windowed}
-import org.apache.kafka.streams.scala._
-import org.apache.kafka.streams.scala.kstream.{KGroupedStream, KStream, KTable}
 
-import org.apache.kafka.clients.admin.{AdminClientConfig, ListTopicsOptions}
-import org.apache.kafka.clients.admin.AdminClient
-import org.apache.kafka.common.errors.TimeoutException
-import java.util.concurrent.ExecutionException
-// import scala.io
 
 
 object StockDataApiStreaming{
-    // import io.circe.generic.auto._
-    import org.apache.kafka.streams.scala.ImplicitConversions._
-    import org.apache.kafka.streams.scala.Serdes._
-
+    
     implicit def serde[A >: Null : Decoder : Encoder]: Serde[A] = {
         val serializer = (a: A) => a.asJson.noSpaces.getBytes
         val deserializer = (aAsBytes: Array[Byte]) => {
@@ -106,8 +93,22 @@ object StockDataApiStreaming{
 
     def SendApiAction(key: String, d: WatchListData): Unit = {
         println(s"sending api to check price of: ${d.SYM} and then send via producer..")
-        val http_data: String = api.run(d.SYM)
-        val record = new ProducerRecord[String, String]("api-sink-topic", http_data)
+        // val http_data: String = api.run(d.SYM)
+        val sample_http_data: String = """
+            "Global Quote": {
+                "01. symbol": "IBM",
+                "02. open": "129.6400",
+                "03. high": "130.8600",
+                "04. low": "129.5900",
+                "05. price": "130.1900",
+                "06. volume": "2982980",
+                "07. latest trading day": "2023-03-06",
+                "08. previous close": "129.6400",
+                "09. change": "0.5500",
+                "10. change percent": "0.4243%"
+            }
+        """
+        val record = new ProducerRecord[String, String]("api-sink-topic", sample_http_data)
         producer.send(record)
     }
 
@@ -121,7 +122,7 @@ object StockDataApiStreaming{
 
         val watch_list_stream: KStream[String, WatchListData] = builder.stream[String, WatchListData]("source-topic").peek((_,d) => println(d))
         watch_list_stream.foreach(SendApiAction)
-        watch_list_stream.to("api-sink-topic")
+        // watch_list_stream.to("api-sink-topic")
 
         // val stock_quote_data_stream = grouped_by_SYM_stream.foreach(SendApiAction)
         // stock_quote_data_stream.to(PriceUpdateTopic)

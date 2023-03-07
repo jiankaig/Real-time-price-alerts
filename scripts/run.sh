@@ -30,9 +30,7 @@ do
   echo "Waiting for kafka-connect.."
   sleep 5
 done 
-echo "\n curl -d @"scripts/jdbc-source-polling.json" \
-    -H "Content-Type: application/json" \
-    -X POST http://localhost:8083/connectors"
+echo "create jdbc source connector"
 curl -s -d @"scripts/jdbc-source-polling.json" \
     -H "Content-Type: application/json" \
     -X POST http://localhost:8083/connectors | jq .
