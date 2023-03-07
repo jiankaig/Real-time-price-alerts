@@ -28,9 +28,9 @@ version := "1.0"
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
     
-  "org.apache.kafka" % "kafka-clients" % "2.8.0",
-  "org.apache.kafka" % "kafka-streams" % "2.8.0",
-  "org.apache.kafka" %% "kafka-streams-scala" % "2.8.0",
+  "org.apache.kafka" % "kafka-clients" % "3.2.0",
+  "org.apache.kafka" % "kafka-streams" % "3.2.0",
+  "org.apache.kafka" %% "kafka-streams-scala" % "3.2.0",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
@@ -39,6 +39,9 @@ libraryDependencies ++= Seq(
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
 
   "io.github.azhur" %% "kafka-serde-circe" % "0.5.0",
+
+  "ch.qos.logback" % "logback-classic" % "1.1.3" //% Runtime,
+
 )
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
