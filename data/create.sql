@@ -25,3 +25,5 @@ CREATE TABLE UpdatingWatchListTable(
     Price REAL,
     LastUpdateTimeStamp_UNIX INT
 );
+INSERT INTO UpdatingWatchListTable(SYM,Price,LastUpdateTimeStamp_UNIX) 
+VALUES("META", 0.0, (UNIXEPOCH('now')));

@@ -51,3 +51,9 @@ then run:
 
 then check the topic:
 ` docker exec -it broker bash /usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic my-source-topic --from-beginning `
+
+## Reproduce application
+1. prepare sqlite table
+2. run bash script `run.sh` (docker is launched)
+3. run scala application: `StockDataApiStreaming`
+4. check results

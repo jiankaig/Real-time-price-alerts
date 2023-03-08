@@ -105,30 +105,26 @@ object StockDataApiStreaming{
 
 //*************************    Topology     ********************************//
 
-        val watch_list_stream: KStream[String, WatchListData] = 
-            builder.stream[String, WatchListData]("source-topic").peek((_,d) => println(d))
-        watch_list_stream.foreach( (key: String, d: WatchListData) => {
-            // println(s"sending api to check price of: ${d.SYM} and then send via producer..")
-            // val http_data: String = api.run(d.SYM)
-            val fake_data = """{"SYM":"DEF","Price":999.888,"LastUpdateTimeStamp_UNIX":1678281999}"""
+        val watch_list_stream: KStream[String, UpdatingWatchListData] = 
+            builder.stream[String, UpdatingWatchListData]("source-topic").peek((_,d) => println(d))
+        watch_list_stream.foreach( (key: String, d: UpdatingWatchListData) => {
+            println(s"sending api to check price of: ${d.SYM} and then send via producer..")
+            val http_data: String = api.run(d.SYM)
+            if (http_data contains "500") {
+                println(s"[ERROR]API LIMIT REACHED: $http_data")
+            }
+            val symbol = v.`Global Quote`.`01. symbol`
+            val price = v.`Global Quote`.`05. price`.toFloat
+            val now_timestamp: Int = (System.currentTimeMillis / 1000).toInt
             // val record = new ProducerRecord[String, String]("api-sink-topic", sample_http_data)
-            val record = new ProducerRecord[String, String]("api-sink-topic", fake_data)
+            // val fake_data = """{"SYM":"DEF","Price":555.888,"LastUpdateTimeStamp_UNIX":1678282299}"""
+            // val record = new ProducerRecord[String, String]("api-sink-topic", fake_data)
+            val record = new ProducerRecord[String, String]("api-sink-topic", http_data)
             producer.send(record)
         })
         val price_update_stream: KStream[String, UpdatingWatchListData] = 
             builder.stream[String, UpdatingWatchListData]("api-sink-topic")
-            // .map( (k, v) => {
-            //     val symbol = v.`Global Quote`.`01. symbol`
-            //     val price = v.`Global Quote`.`05. price`.toFloat
-            //     val timestamp: Int = (System.currentTimeMillis / 1000).toInt
-            //     val updating_watch_list_data = UpdatingWatchListData(
-            //         SYM = symbol,
-            //         Price = price,
-            //         LastUpdateTimeStamp_UNIX = timestamp
-            //     )
-            //     (k, updating_watch_list_data)
-            // })
-        price_update_stream.to("price-update-topic")
+            .to("price-update-topic")
 
         // val stock_quote_data_stream = grouped_by_SYM_stream.foreach(SendApiAction)
         // stock_quote_data_stream.to(PriceUpdateTopic)
