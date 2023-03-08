@@ -7,6 +7,7 @@
     "mode": "bulk",
     "query": "SELECT * FROM watch_list",
     "topic.prefix": "source-topic",
+    "poll.interval.ms": 30000,
     "transforms":"createKey,extractKey",
     "transforms.createKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
     "transforms.createKey.fields":"SYM",

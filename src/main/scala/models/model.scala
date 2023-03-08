@@ -13,3 +13,17 @@ case class Global_Quote_Model(
     `09. change`: String,
     `10. change percent`: String
 )
+
+case class WatchListData(
+    val id: Int, 
+    val SYM: String, 
+    val Price: Double, 
+    val SRC: String, 
+    val CreateTimeStamp: String, 
+    val LastUpdateTimeStamp_UNIX: Int
+)      
+case class UpdatingWatchListData(
+    val SYM: String, 
+    val Price: Float, 
+    val LastUpdateTimeStamp_UNIX: Int
+)      

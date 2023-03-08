@@ -1,0 +1,14 @@
+{
+    "name": "jdbc-sink",
+    "config": {
+      "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+      "tasks.max": "1",
+      "topics": "testTopic",
+      "connection.url": "jdbc:sqlite:/tmp/data/test.db",
+      "insert.mode": "insert",
+      "table.name.format": "testTable",
+      "name": "jdbc-sink",
+      "errors.log.enable": true,
+      "errors.log.include.messages": true
+    }
+}

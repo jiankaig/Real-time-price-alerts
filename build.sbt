@@ -2,6 +2,7 @@
 // The simplest possible sbt build file is just one line:
 
 scalaVersion := "2.13.8"
+// scalaVersion := "2.12.17"
 // That is, to create a valid sbt build, all you've got to do is define the
 // version of Scala you'd like your project to use.
 
@@ -36,7 +37,10 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser" % "0.14.1",
 
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
-  "ch.qos.logback" % "logback-classic" % "1.1.3" //% Runtime,
+  "ch.qos.logback" % "logback-classic" % "1.1.3", //% Runtime,
+
+  "dev.zio" %% "zio-kafka"   % "0.15.0",
+  "dev.zio" %% "zio-json"    % "0.1.5",
 
 )
 

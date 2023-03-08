@@ -1,0 +1,14 @@
+{
+    "name": "jdbc-sink",
+    "config": {
+      "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+      "tasks.max": "1",
+      "topics": "price-update-topic",
+      "connection.url": "jdbc:sqlite:/tmp/data/watch_list.db",
+      "insert.mode": "update",
+      "table.name.format": "watch_list",
+      "pk.mode": "record_key",
+      "pk.fields": "SYM",
+      "name": "jdbc-sink"
+    }
+  }
