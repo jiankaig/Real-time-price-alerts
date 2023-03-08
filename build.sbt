@@ -39,8 +39,8 @@ libraryDependencies ++= Seq(
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
   "ch.qos.logback" % "logback-classic" % "1.1.3", //% Runtime,
 
-  "dev.zio" %% "zio-kafka"   % "0.15.0",
-  "dev.zio" %% "zio-json"    % "0.1.5",
+  // "org.apache.avro" % "avro" % "1.11.1",
+  // "io.confluent" % "kafka-avro-serializer" % "7.0.8",
 
 )
 

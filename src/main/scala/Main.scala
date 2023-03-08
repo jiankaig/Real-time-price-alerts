@@ -33,6 +33,8 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 
+import io.confluent.kafka.serializers.KafkaAvroSerializer
+
 
 // ************************************************************************* //
 // *******************     StockDataApiStreaming     *********************** //
@@ -54,14 +56,6 @@ object StockDataApiStreaming{
         }
         Serdes.fromFn[A](serializer, deserializer)
     }
-
-    val SourceTopic: String = "source-topic"
-    val SymbolsTopic: String = "symbols-topic"
-    val ApiSinkTopic: String = "api-sink-topic"
-    val PriceUpdateTopic: String = "price-update-topic"
-    val PriceAlertTopic: String = "price-alert-topic"
-    var continue = true
-    val intervalSeconds = 10
     
     val api = new HttpClient()
 
