@@ -72,17 +72,17 @@ services:
       CONNECT_CONFIG_STORAGE_TOPIC: connect-config-storage-topic
       CONNECT_OFFSET_STORAGE_TOPIC: connect-offset-storage-topic
       CONNECT_STATUS_STORAGE_TOPIC: connect-status-storage-topic
-      # CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      # CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      # CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: false
-      # CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-
-      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_KEY_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT: true
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: false
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT: true
+
+      # CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      # CONNECT_KEY_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT: true
+      # CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      # CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      # CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      # CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT: true
       
 
     volumes:

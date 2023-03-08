@@ -33,15 +33,11 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 
-import io.confluent.kafka.serializers.KafkaAvroSerializer
-
 
 // ************************************************************************* //
 // *******************     StockDataApiStreaming     *********************** //
 // ************************************************************************* //
 object StockDataApiStreaming{
-    // implicit val conf: Config = Map("schema.registry.url" -> "http://localhost:8081")
-
     implicit def serde[A >: Null : Decoder : Encoder]: Serde[A] = {
         val serializer = (a: A) => a.asJson.noSpaces.getBytes
         val deserializer = (aAsBytes: Array[Byte]) => {
@@ -87,10 +83,7 @@ object StockDataApiStreaming{
         // case _: Throwable => println("Got some other kind of Throwable exception")
     }
 
-    def SendApiAction(key: String, d: WatchListData): Unit = {
-        println(s"sending api to check price of: ${d.SYM} and then send via producer..")
-        // val http_data: String = api.run(d.SYM)
-        val sample_http_data: String = """{
+    val sample_http_data: String = """{
     "Global Quote": {
         "01. symbol": "ABC",
         "02. open": "130.2800",
@@ -104,47 +97,45 @@ object StockDataApiStreaming{
         "10. change percent": "-1.4901%"
     }
 }"""
-        val record = new ProducerRecord[String, String]("api-sink-topic", sample_http_data)
-        producer.send(record)
-    }
-
 
     def main(args: Array[String]): Unit = {
 
         // Create a StreamsBuilder object
         val builder = new StreamsBuilder()
 
-        //**    Topology     **//
+//*************************    Topology     ********************************//
 
         val watch_list_stream: KStream[String, WatchListData] = 
             builder.stream[String, WatchListData]("source-topic").peek((_,d) => println(d))
-        watch_list_stream.foreach(SendApiAction)
-        // watch_list_stream.foreach( (key: String, d: WatchListData) => {
-        //     println(s"sending api to check price of: ${d.SYM} and then send via producer..")
-        //     val http_data: String = api.run(d.SYM)
-        //     val record = new ProducerRecord[String, String]("api-sink-topic", http_data)
-        //     producer.send(record)
-        // })
-        val price_update_stream: KStream[String, Data_Model] = 
-            builder.stream[String, Data_Model]("api-sink-topic").peek((_,d) => println(d))
-        price_update_stream.map( (k, v) => {
-            val symbol = v.`Global Quote`.`01. symbol`
-            val price = v.`Global Quote`.`05. price`.toFloat
-            val timestamp: Int = (System.currentTimeMillis / 1000).toInt
-            val updating_watch_list_data = UpdatingWatchListData(
-                SYM = symbol,
-                Price = price,
-                LastUpdateTimeStamp_UNIX = timestamp
-            )
-            (k, updating_watch_list_data)
-        }).to("price-update-topic")
+        watch_list_stream.foreach( (key: String, d: WatchListData) => {
+            // println(s"sending api to check price of: ${d.SYM} and then send via producer..")
+            // val http_data: String = api.run(d.SYM)
+            val fake_data = """{"SYM":"DEF","Price":999.888,"LastUpdateTimeStamp_UNIX":1678281999}"""
+            // val record = new ProducerRecord[String, String]("api-sink-topic", sample_http_data)
+            val record = new ProducerRecord[String, String]("api-sink-topic", fake_data)
+            producer.send(record)
+        })
+        val price_update_stream: KStream[String, UpdatingWatchListData] = 
+            builder.stream[String, UpdatingWatchListData]("api-sink-topic")
+            // .map( (k, v) => {
+            //     val symbol = v.`Global Quote`.`01. symbol`
+            //     val price = v.`Global Quote`.`05. price`.toFloat
+            //     val timestamp: Int = (System.currentTimeMillis / 1000).toInt
+            //     val updating_watch_list_data = UpdatingWatchListData(
+            //         SYM = symbol,
+            //         Price = price,
+            //         LastUpdateTimeStamp_UNIX = timestamp
+            //     )
+            //     (k, updating_watch_list_data)
+            // })
+        price_update_stream.to("price-update-topic")
 
         // val stock_quote_data_stream = grouped_by_SYM_stream.foreach(SendApiAction)
         // stock_quote_data_stream.to(PriceUpdateTopic)
 
         //.peek((_,d) => println(d))
 
-        //** End of Topology **//
+//*************************    End Of Topology     *************************//
 
 
         // Start the Kafka Streams application

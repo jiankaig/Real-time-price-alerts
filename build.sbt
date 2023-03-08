@@ -39,9 +39,6 @@ libraryDependencies ++= Seq(
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
   "ch.qos.logback" % "logback-classic" % "1.1.3", //% Runtime,
 
-  // "org.apache.avro" % "avro" % "1.11.1",
-  // "io.confluent" % "kafka-avro-serializer" % "7.0.8",
-
 )
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,

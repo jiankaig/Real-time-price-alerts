@@ -18,3 +18,10 @@ CREATE TABLE testTable(
     id INTEGER,
     name TEXT
 );
+
+DROP TABLE IF EXISTS UpdatingWatchListTable;
+CREATE TABLE UpdatingWatchListTable(
+    SYM TEXT,
+    Price REAL,
+    LastUpdateTimeStamp_UNIX INT
+);
