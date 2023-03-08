@@ -93,21 +93,26 @@ object StockDataApiStreaming{
 //*************************    Topology     ********************************//
 
         val watch_list_stream: KStream[String, UpdatingWatchListData] = 
-            builder.stream[String, UpdatingWatchListData]("source-topic").peek((_,d) => println(d))
+            builder.stream[String, UpdatingWatchListData]("source-topic")
         watch_list_stream.foreach( (key: String, d: UpdatingWatchListData) => {
             println(s"sending api to check price of: ${d.SYM} and then send via producer..")
             val (http_data,c,r) = api.run(d.SYM)
-            if (http_data contains "Thank you for") {
-                println(s"[ERROR]API LIMIT REACHED: $http_data")
+
+            val result = parser.decode[Api_Output_Model](http_data)
+            result match {
+                case Right(global_quote) => {
+                    val parsed: Json = parse(http_data).getOrElse(Json.Null)
+                    val cursor: HCursor = parsed.hcursor
+                    val symbol = cursor.downField("Global Quote").downField("01. symbol").as[String].getOrElse("NA")
+                    val price = cursor.downField("Global Quote").downField("05. price").as[Float].getOrElse("NA")
+                    val now_timestamp: Int = (System.currentTimeMillis / 1000).toInt
+                    val price_data: String =  s"""{"SYM":"$symbol","Price":$price,"LastUpdateTimeStamp_UNIX":$now_timestamp}"""
+                    val record = new ProducerRecord[String, String]("price-update-topic", price_data)
+                    producer.send(record)
+                }
+                case Left(error) => println(s"Error: $error, do nothing...")
             }
-            val parsed: Json = parse(http_data).getOrElse(Json.Null)
-            val cursor: HCursor = parsed.hcursor
-            val symbol = cursor.downField("Global Quote").downField("01. symbol").as[String].getOrElse("NA")
-            val price = cursor.downField("Global Quote").downField("05. price").as[Float].getOrElse("NA")
-            val now_timestamp: Int = (System.currentTimeMillis / 1000).toInt
-            val price_data: String =  s"""{"SYM":"$symbol","Price":$price,"LastUpdateTimeStamp_UNIX":$now_timestamp}"""
-            val record = new ProducerRecord[String, String]("price-update-topic", price_data)
-            producer.send(record)
+            
         })
 
 //*************************    End Of Topology     *************************//
