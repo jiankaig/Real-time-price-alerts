@@ -87,5 +87,4 @@ services:
 
     volumes:
       - $PWD/plugins/confluentinc-kafka-connect-jdbc-10.6.4/lib:/usr/share/java/confluentinc-kafka-connect-jdbc
-      - $PWD/data:/tmp/data
-      - $PWD/scripts:/tmp/scripts
+      - $PWD/data/data:/tmp/data

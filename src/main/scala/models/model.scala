@@ -1,6 +1,6 @@
 package models
 
-case class Data_Model(`Global Quote`: Global_Quote_Model)
+case class Api_Output_Model(`Global Quote`: Global_Quote_Model)
 case class Global_Quote_Model(
     `01. symbol`: String,
     `02. open`: String,

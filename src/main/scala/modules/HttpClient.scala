@@ -1,5 +1,5 @@
 package modules
-import models.Data_Model
+import models.Api_Output_Model
 
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.client.methods.HttpGet
@@ -47,7 +47,7 @@ object HttpClient {
         // val http_data: String = e.run("IBM")
 
         // data parsing and validation
-        val result = parser.decode[Data_Model](http_data)
+        val result = parser.decode[Api_Output_Model](http_data)
         result match {
             case Right(global_quote) => println(global_quote)
             case Left(error) => println(s"Error: $error")

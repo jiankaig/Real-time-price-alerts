@@ -7,8 +7,8 @@ kafka topic using kafka connect.
 
 ## Create sqlite database
 run:
-` sqlite3 data/watch_list.db '.read data/create.sql' `
+` sqlite3 data/data/watch_list.db '.read data/scripts/create.sql' `
 
 ## Update db
 run:
-` sqlite3 data/watch_list.db '.read data/update.sql' `
+` sqlite3 data/data/watch_list.db '.read data/scripts/update.sql' `
