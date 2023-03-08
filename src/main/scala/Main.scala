@@ -11,6 +11,8 @@ import modules.HttpClient
 import models._
 
 // Lib
+import cats.syntax.either._
+import io.circe._
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
@@ -83,21 +85,6 @@ object StockDataApiStreaming{
         // case _: Throwable => println("Got some other kind of Throwable exception")
     }
 
-    val sample_http_data: String = """{
-    "Global Quote": {
-        "01. symbol": "ABC",
-        "02. open": "130.2800",
-        "03. high": "130.4200",
-        "04. low": "128.1900",
-        "05. price": "999.2500",
-        "06. volume": "3498494",
-        "07. latest trading day": "2023-03-07",
-        "08. previous close": "130.1900",
-        "09. change": "-1.9400",
-        "10. change percent": "-1.4901%"
-    }
-}"""
-
     def main(args: Array[String]): Unit = {
 
         // Create a StreamsBuilder object
@@ -109,27 +96,19 @@ object StockDataApiStreaming{
             builder.stream[String, UpdatingWatchListData]("source-topic").peek((_,d) => println(d))
         watch_list_stream.foreach( (key: String, d: UpdatingWatchListData) => {
             println(s"sending api to check price of: ${d.SYM} and then send via producer..")
-            val http_data: String = api.run(d.SYM)
-            if (http_data contains "500") {
+            val (http_data,c,r) = api.run(d.SYM)
+            if (http_data contains "Thank you for") {
                 println(s"[ERROR]API LIMIT REACHED: $http_data")
             }
-            val symbol = v.`Global Quote`.`01. symbol`
-            val price = v.`Global Quote`.`05. price`.toFloat
+            val parsed: Json = parse(http_data).getOrElse(Json.Null)
+            val cursor: HCursor = parsed.hcursor
+            val symbol = cursor.downField("Global Quote").downField("01. symbol").as[String].getOrElse("NA")
+            val price = cursor.downField("Global Quote").downField("05. price").as[Float].getOrElse("NA")
             val now_timestamp: Int = (System.currentTimeMillis / 1000).toInt
-            // val record = new ProducerRecord[String, String]("api-sink-topic", sample_http_data)
-            // val fake_data = """{"SYM":"DEF","Price":555.888,"LastUpdateTimeStamp_UNIX":1678282299}"""
-            // val record = new ProducerRecord[String, String]("api-sink-topic", fake_data)
-            val record = new ProducerRecord[String, String]("api-sink-topic", http_data)
+            val price_data: String =  s"""{"SYM":"$symbol","Price":$price,"LastUpdateTimeStamp_UNIX":$now_timestamp}"""
+            val record = new ProducerRecord[String, String]("price-update-topic", price_data)
             producer.send(record)
         })
-        val price_update_stream: KStream[String, UpdatingWatchListData] = 
-            builder.stream[String, UpdatingWatchListData]("api-sink-topic")
-            .to("price-update-topic")
-
-        // val stock_quote_data_stream = grouped_by_SYM_stream.foreach(SendApiAction)
-        // stock_quote_data_stream.to(PriceUpdateTopic)
-
-        //.peek((_,d) => println(d))
 
 //*************************    End Of Topology     *************************//
 
