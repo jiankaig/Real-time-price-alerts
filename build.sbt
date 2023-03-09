@@ -28,18 +28,30 @@ version := "1.0"
 
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
-    
+  
+  "org.apache.kafka" %% "kafka" % "3.4.0",
   "org.apache.kafka" % "kafka-clients" % "3.4.0",
   "org.apache.kafka" % "kafka-streams" % "3.4.0",
-  "org.apache.kafka" %% "kafka-streams-scala" % "3.2.0",
+  "org.apache.kafka" %% "kafka-streams-scala" % "3.4.0",
+  
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
 
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
-  "ch.qos.logback" % "logback-classic" % "1.1.3"% Runtime,
+
+  "ch.qos.logback" % "logback-classic" % "1.1.3" % Runtime, // % Test/Runtime/Compile
+
+  // "org.apache.logging.log4j" % "log4j-api" % "2.17.0",
+  // "org.apache.logging.log4j" % "log4j-core" % "2.17.0",
+  // "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.0",
 
 )
+
+assemblyMergeStrategy in assembly := {
+ case PathList("META-INF", _*) => MergeStrategy.discard
+ case _                        => MergeStrategy.first
+}
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
 // we're adding the scala-parser-combinators dependency to the set of dependencies
