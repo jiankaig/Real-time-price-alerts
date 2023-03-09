@@ -32,9 +32,6 @@ import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.apache.kafka.clients.admin.{AdminClientConfig, ListTopicsOptions}
 import org.apache.kafka.clients.admin.AdminClient
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.util.EntityUtils
 
 
 // ************************************************************************* //
