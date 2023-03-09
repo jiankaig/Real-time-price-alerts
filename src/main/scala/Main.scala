@@ -5,14 +5,15 @@ import java.util.Properties
 import scala.concurrent.duration._
 // import java.util.concurrent.TimeUnit
 import java.util.concurrent.ExecutionException // for AdminClient
+import java.time.LocalDateTime
 
 // Custom
 import modules.HttpClient
 import models._
 
 // Lib
-import cats.syntax.either._
-import io.circe._
+import cats.syntax.either._ //check if needed
+import io.circe._ //check if needed
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
@@ -95,7 +96,7 @@ object StockDataApiStreaming{
         val watch_list_stream: KStream[String, UpdatingWatchListData] = 
             builder.stream[String, UpdatingWatchListData]("source-topic")
         watch_list_stream.foreach( (key: String, d: UpdatingWatchListData) => {
-            println(s"sending api to check price of: ${d.SYM} and then send via producer..")
+            println(s" ${LocalDateTime.now()}:\tsending api to check price of: ${d.SYM} and then send via producer..")
             val (http_data,c,r) = api.run(d.SYM)
 
             val result = parser.decode[Api_Output_Model](http_data)
@@ -110,11 +111,11 @@ object StockDataApiStreaming{
                     val record = new ProducerRecord[String, String]("price-update-topic", price_data)
                     producer.send(record)
                 }
-                case Left(error) => println(s"Error: $error, do nothing...")
+                case Left(error) => println(s" ${LocalDateTime.now()}:\tWARNING: $error; api reached limit, do nothing...")
             }
             
         })
-
+        // Outside of this program, price-update-topic streams to price-update-topic-schema
 //*************************    End Of Topology     *************************//
 
 

@@ -6,7 +6,7 @@
       "connection.url": "jdbc:sqlite:/tmp/data/watch_list.db",
       "mode": "timestamp",
       "timestamp.column.name": "LastUpdateTimeStamp_UNIX",
-      "query": "SELECT * FROM watch_list",
+      "query": "SELECT * FROM UpdatingWatchListTable",
       "topic.prefix": "source-topic",
       "poll.interval.ms": 30000,
       "timestamp.delay.interval.ms": 10000,

@@ -37,7 +37,7 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser" % "0.14.1",
 
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
-  "ch.qos.logback" % "logback-classic" % "1.1.3", //% Runtime,
+  "ch.qos.logback" % "logback-classic" % "1.1.3"% Runtime,
 
 )
 
