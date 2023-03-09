@@ -29,8 +29,8 @@ version := "1.0"
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
     
-  "org.apache.kafka" % "kafka-clients" % "3.2.0",
-  "org.apache.kafka" % "kafka-streams" % "3.2.0",
+  "org.apache.kafka" % "kafka-clients" % "3.4.0",
+  "org.apache.kafka" % "kafka-streams" % "3.4.0",
   "org.apache.kafka" %% "kafka-streams-scala" % "3.2.0",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-generic" % "0.14.1",
