@@ -38,7 +38,7 @@ do
 done 
 
 echo "create jdbc source/sink connections"
-curl -s -d @"scripts/jdbc-source-loopback.json" \
+curl -s -d @"scripts/jdbc-source-polling.json" \
     -H "Content-Type: application/json" \
     -X POST http://localhost:8083/connectors | jq .
 

@@ -1,9 +1,8 @@
-UPDATE watch_list
-SET Price = 13,
-    LastUpdateTimeStamp_UNIX = (UNIXEPOCH('now'))
-WHERE SYM = "IBM";
+UPDATE UpdatingWatchListTable
+SET LastUpdateTimeStamp_UNIX = (UNIXEPOCH('now'))
+WHERE SYM = "NVDA";
 
-SELECT * FROM watch_list;
+SELECT * FROM UpdatingWatchListTable;
 
 
 
