@@ -46,25 +46,25 @@ curl -s -d @"scripts/jdbc-sink-updating.json" \
     -H "Content-Type: application/json" \
     -X POST http://localhost:8083/connectors | jq .
 
-
+docker container restart kafkacat
 ### Dirty way to parse json with schema and payload signatures
 ### bridges between two topics
 ### https://rmoff.net/2020/01/22/kafka-connect-and-schemas/
-echo "Running slient kcat"
-kcat -b localhost:9092 -q -u -X auto.offset.reset=earliest -t price-update-topic | \
-jq --compact-output --unbuffered \
-    '. |
-    {   schema: { type: "struct", optional: false, fields: [
-                { type: "string", optional: true, field:"SYM"},
-                { type :"float", optional: true, field:"Price"},
-                { type :"int64", optional: true, field:"LastUpdateTimeStamp_UNIX"}]},
-        payload: {
-            SYM: .SYM,
-            Price: .Price,
-            LastUpdateTimeStamp_UNIX: .LastUpdateTimeStamp_UNIX
-            }
-    }' | \
-kcat -b localhost:9092 -t price-update-topic-schema -P -T -u | jq --unbuffered '.'
+# echo "Running slient kcat"
+# kcat -b localhost:9092 -q -u -X auto.offset.reset=earliest -t price-update-topic | \
+# jq --compact-output --unbuffered \
+#     '. |
+#     {   schema: { type: "struct", optional: false, fields: [
+#                 { type: "string", optional: true, field:"SYM"},
+#                 { type :"float", optional: true, field:"Price"},
+#                 { type :"int64", optional: true, field:"LastUpdateTimeStamp_UNIX"}]},
+#         payload: {
+#             SYM: .SYM,
+#             Price: .Price,
+#             LastUpdateTimeStamp_UNIX: .LastUpdateTimeStamp_UNIX
+#             }
+#     }' | \
+# kcat -b localhost:9092 -t price-update-topic-schema -P -T -u | jq --unbuffered '.'
 
 # Ctrl+C to exit.
 

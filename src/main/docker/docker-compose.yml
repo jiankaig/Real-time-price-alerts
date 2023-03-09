@@ -83,8 +83,57 @@ services:
       # CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
       # CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       # CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT: true
-      
 
     volumes:
       - $PWD/plugins/confluentinc-kafka-connect-jdbc-10.6.4/lib:/usr/share/java/confluentinc-kafka-connect-jdbc
       - $PWD/data/data:/tmp/data
+  
+    # healthcheck:
+    #   # test: ["CMD-SHELL", "curl --silent --fail localhost:8083/connector-plugins || exit 1"]
+    #   test: ["CMD", "curl", "-f", "http://localhost:8083/connector-plugins"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  kafkacat:
+    platform: linux/arm64
+    image: confluentinc/cp-kafkacat:7.1.6
+    # image: edenhill/kcat:1.7.1
+    hostname: kafkacat
+    container_name: kafkacat
+    # depends_on:
+    #   - kafka-connect
+    #   # kafka-connect:
+    #   #   condition: service_healthy
+    # links:
+    #   - kafka-connect
+    
+    # restart: on-failure
+    restart: always
+    # command: kafkacat -b kafka:29092 -L
+    # command: 
+    # # - chmod +x /tmp/scripts/kcat.sh
+    # - /tmp/scripts/kcat.sh
+    # entrypoint: 
+    # - chmod +x /tmp/scripts/kcat.sh
+    # - /tmp/scripts/kcat.sh
+
+    # volumes:
+    #   - $PWD/scripts:/tmp/scripts
+
+    # entrypoint: kafkacat -b kafka:29092
+    entrypoint:
+    - kafkacat -b kafka:29092 
+    - -q -u -X auto.offset.reset=earliest -t price-update-topic |
+    - jq --compact-output --unbuffered
+    - '. | {   schema: { type: "struct", optional: false, fields: [
+                { type: "string", optional: true, field:"SYM"},
+                { type :"float", optional: true, field:"Price"},
+                { type :"int64", optional: true, field:"LastUpdateTimeStamp_UNIX"}]},
+        payload: {
+            SYM: .SYM,
+            Price: .Price,
+            LastUpdateTimeStamp_UNIX: .LastUpdateTimeStamp_UNIX
+      }}' 
+    - | 
+    - kafkacat -b kafka:29092 -t price-update-topic-schema -P -T -u | jq --unbuffered '.'
