@@ -77,14 +77,25 @@ services:
       CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: false
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
 
-      # CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      # CONNECT_KEY_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT: true
-      # CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      # CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      # CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      # CONNECT_VALUE_CONVERTER_ENHANCED_AVRO_SCHEMA_SUPPORT: true
-      
-
     volumes:
       - $PWD/plugins/confluentinc-kafka-connect-jdbc-10.6.4/lib:/usr/share/java/confluentinc-kafka-connect-jdbc
       - $PWD/data/data:/tmp/data
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss:latest
+    platform: linux/arm64
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      GF_INSTALL_PLUGINS: "frser-sqlite-datasource,cloudspout-button-panel"
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: true
+    volumes:
+      - $PWD/data/data:/var/lib/grafana/data
+      - $PWD/grafana/provisioning:/etc/grafana/provisioning/
+      - $PWD/grafana/dashboards:/var/lib/grafana/dashboards
+
+    

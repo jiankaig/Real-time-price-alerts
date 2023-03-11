@@ -1,6 +1,6 @@
 # Real Time Price Alerts
 
-![sa diagram](/images/SA-Diagram.jpg)
+![sa diagram](/images/SA-Diagram_v2.jpeg)
 
 ## Introduction
 this is a streaming data engineering mini project that uses kafka streams api. The sqlite table acts as the source of truth for a hypothetical dashboard to show live stock data. Any Inserts into the table will trigger the JDBC Source connector to poll table values into a source kafka topic and the subsequent processes will run and update the table with new price data.
@@ -17,4 +17,4 @@ this is a streaming data engineering mini project that uses kafka streams api. T
 1. prepare sqlite table.
 2. run bash script `run.sh` in `/scripts` dir.
 3. run scala application via Metals extension.
-4. Monitor result, either "SELECT * FROM my_watchlist_table" OR kcat utility to check messages in topics.
+4. Monitor result, open grafana dashboard at http://localhost:3000
