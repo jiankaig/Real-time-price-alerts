@@ -46,12 +46,13 @@ curl -s -d @"scripts/jdbc-sink-updating.json" \
     -H "Content-Type: application/json" \
     -X POST http://localhost:8083/connectors | jq .
 
-
 ### Dirty way to parse json with schema and payload signatures
 ### bridges between two topics
 ### https://rmoff.net/2020/01/22/kafka-connect-and-schemas/
+# echo "Running slient kcat"
 echo "Running slient kcat"
-kcat -b localhost:9092 -q -u -X auto.offset.reset=earliest -t price-update-topic | \
+docker exec -it `docker ps -q --filter name=kafkacat` \
+  /bin/sh -c "kcat -b kafka:29092 -q -u -X auto.offset.reset=earliest -t price-update-topic" | \
 jq --compact-output --unbuffered \
     '. |
     {   schema: { type: "struct", optional: false, fields: [
@@ -64,7 +65,8 @@ jq --compact-output --unbuffered \
             LastUpdateTimeStamp_UNIX: .LastUpdateTimeStamp_UNIX
             }
     }' | \
-kcat -b localhost:9092 -t price-update-topic-schema -P -T -u | jq --unbuffered '.'
+docker exec -i `docker ps -q --filter name=kafkacat` \
+  /bin/sh -c "kcat -b kafka:29092 -t price-update-topic-schema -P -T -u" | \
+jq --unbuffered '.'
 
 # Ctrl+C to exit.
-

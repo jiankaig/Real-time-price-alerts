@@ -38,7 +38,15 @@ services:
       KAFKA_LOG_RETENTION_MS: 300000
       KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
       KAFKA_LOG_CLEANUP_POLICY: delete
-
+  kafkacat:
+    image: edenhill/kcat:1.7.1
+    hostname: kafkacat
+    container_name: kafkacat
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    entrypoint: tail -F anything
+    # command: kcat -b kafka:29092 -L
+    
   schema-registry:
     platform: linux/arm64
     image: confluentinc/cp-schema-registry:latest
