@@ -7,6 +7,6 @@ CREATE TABLE UpdatingWatchListTable(
 );
 
 INSERT INTO UpdatingWatchListTable(SYM,Price,LastUpdateTimeStamp_UNIX) 
-VALUES("NVDA", 0.0, (UNIXEPOCH('now')));
+VALUES("TSLA", 0.0, (UNIXEPOCH('now')));
 
 SELECT * FROM UpdatingWatchListTable

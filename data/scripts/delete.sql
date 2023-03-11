@@ -1,4 +1,4 @@
-DELETE FROM watch_list
-WHERE SYM = "META";
+DELETE FROM UpdatingWatchListTable
+WHERE SYM = "COIN";
 
-SELECT * FROM watch_list;
+SELECT * FROM UpdatingWatchListTable;
